@@ -67,6 +67,12 @@ import benefitIcon1 from "./benefits/icon-1.svg";
 import benefitIcon2 from "./benefits/icon-2.svg";
 import benefitIcon3 from "./benefits/icon-3.svg";
 import benefitIcon4 from "./benefits/icon-4.svg";
+import benefitRoadimg from "./benefits/Roadimg.jpg";
+import cleanimg from "./benefits/cleanimg.jpg"
+import water from "./benefits/watersup.jpg";
+import elec from "./benefits/electricity.jpg";
+import waterlogg from "./benefits/waterlog.jpg";
+import muncii from "./benefits/munci.jpg";
 import benefitImage2 from "./benefits/image-2.png";
 
 import discordBlack from "./socials/discord.svg";
@@ -138,6 +144,12 @@ export {
   benefitIcon2,
   benefitIcon3,
   benefitIcon4,
+  benefitRoadimg,
+  cleanimg,
+  water,
+  elec,
+  waterlogg,
+  muncii,
   benefitImage2,
   discordBlack,
   facebook,
