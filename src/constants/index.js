@@ -256,7 +256,7 @@ export const benefits = [
     iconUrl: benefitIcon1,
     imageUrl: benefitRoadimg,
     light: true,
-    route: "/RoadConditions",
+    route: "/issues",
   },
   {
     id: "1",
