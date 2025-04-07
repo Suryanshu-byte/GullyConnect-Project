@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import LoginCard from "./components/LoginCard1.jsx";
+import Newaccount from "./components/Newaccount.jsx"
 import {createBrowserRouter,RouterProvider} from "react-router-dom"
 import App from "./App.jsx";
 import "./index.css";
@@ -9,6 +10,10 @@ const router = createBrowserRouter([{
   Component:LoginCard,
     // Add your routes here
   
+},{
+  path: '/newaccount',
+  Component: Newaccount,
+  // Add your routes here
 },{
   path: '/app',
   Component:App,

@@ -66,7 +66,7 @@ export const navigation = [
   {
     id: "4",
     title: "New account",
-    url: "singup",
+    url: "Newaccount",
     onlyMobile: true,
   },
   {
