@@ -1,6 +1,16 @@
-import React, { useState } from "react";
-
-function IssueCard({ priority, category, title, description, location, status, image }) {
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+function IssueCard({
+  priority,
+  category,
+  title,
+  description,
+  location,
+  status,
+  image,
+}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showSupportInfo, setShowSupportInfo] = useState(false);
 
@@ -19,8 +29,14 @@ function IssueCard({ priority, category, title, description, location, status, i
     <div className="bg-[#0E0C15] text-white p-4 rounded-xl shadow-[16px_0_40px_12px_rgba(139,92,246,0.6)] w-80 flex-shrink-0 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${priorityColors[priority]}`}>{priority} Priority</span>
-          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">{category}</span>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-semibold ${priorityColors[priority]}`}
+          >
+            {priority} Priority
+          </span>
+          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
+            {category}
+          </span>
         </div>
         {status && (
           <span className="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">
@@ -32,7 +48,13 @@ function IssueCard({ priority, category, title, description, location, status, i
       <p className="text-sm text-gray-300">
         {showFullDescription ? description : getShortDescription(description)}
       </p>
-      {image && <img src={image} alt="Issue" className="rounded-lg w-full h-48 object-cover" />} 
+      {image && (
+        <img
+          src={image}
+          alt="Issue"
+          className="rounded-lg w-full h-48 object-cover"
+        />
+      )}
       <div className="flex items-center text-sm text-gray-400 gap-1">
         📍 {location}
       </div>
@@ -53,7 +75,7 @@ function IssueCard({ priority, category, title, description, location, status, i
           className="bg-violet-600 text-white px-3 py-1 rounded-md text-sm hover:bg-violet-700"
           onClick={() => setShowFullDescription(!showFullDescription)}
         >
-          {showFullDescription ? 'Less Details' : 'More Details'}
+          {showFullDescription ? "Less Details" : "More Details"}
         </button>
       </div>
     </div>
@@ -61,17 +83,18 @@ function IssueCard({ priority, category, title, description, location, status, i
 }
 
 const locationData = {
-  "Maharashtra": {
-    "Pune": ["Shivajinagar", "Kothrud", "Baner"],
-    "Mumbai": ["Andheri", "Borivali", "Dadar"]
+  Maharashtra: {
+    Pune: ["Shivajinagar", "Kothrud", "Baner"],
+    Mumbai: ["Andheri", "Borivali", "Dadar"],
   },
-  "Karnataka": {
-    "Bangalore": ["MG Road", "Indiranagar", "Whitefield"],
-    "Mysore": ["VV Mohalla", "Nazarbad", "Kuvempunagar"]
+  Karnataka: {
+    Bangalore: ["MG Road", "Indiranagar", "Whitefield"],
+    Mysore: ["VV Mohalla", "Nazarbad", "Kuvempunagar"],
   },
 };
 
 function ReportIssuePage({ onAddIssue }) {
+  let [donemsg, setDoneMsg] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -93,8 +116,24 @@ function ReportIssuePage({ onAddIssue }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    //console.log(formData);
+    let data = await axios.post(
+      "http://localhost:3000/app/v1/userProblems/problems",
+      {
+        pName: formData.title,
+        pType: formData.category,
+        pDescrition: formData.description,
+        pPriority: formData.priority,
+        PAddress: formData.state,
+        pImage: formData.image,
+      }
+    );
+    setDoneMsg("problem registered");
+
+    // console.log(data);
+
     const fullLocation = `${formData.area}, ${formData.district}, ${formData.state}`;
     onAddIssue({
       ...formData,
@@ -114,8 +153,13 @@ function ReportIssuePage({ onAddIssue }) {
   };
 
   const states = Object.keys(locationData);
-  const districts = formData.state ? Object.keys(locationData[formData.state]) : [];
-  const areas = formData.state && formData.district ? locationData[formData.state][formData.district] : [];
+  const districts = formData.state
+    ? Object.keys(locationData[formData.state])
+    : [];
+  const areas =
+    formData.state && formData.district
+      ? locationData[formData.state][formData.district]
+      : [];
 
   return (
     <section className="bg-[#0E0C15] text-white p-6 flex flex-col items-center gap-8">
@@ -177,7 +221,9 @@ function ReportIssuePage({ onAddIssue }) {
           >
             <option value="">Select State</option>
             {states.map((state) => (
-              <option key={state} value={state}>{state}</option>
+              <option key={state} value={state}>
+                {state}
+              </option>
             ))}
           </select>
 
@@ -191,7 +237,9 @@ function ReportIssuePage({ onAddIssue }) {
             >
               <option value="">Select District</option>
               {districts.map((district) => (
-                <option key={district} value={district}>{district}</option>
+                <option key={district} value={district}>
+                  {district}
+                </option>
               ))}
             </select>
           )}
@@ -206,7 +254,9 @@ function ReportIssuePage({ onAddIssue }) {
             >
               <option value="">Select Area</option>
               {areas.map((area) => (
-                <option key={area} value={area}>{area}</option>
+                <option key={area} value={area}>
+                  {area}
+                </option>
               ))}
             </select>
           )}
@@ -226,24 +276,45 @@ function ReportIssuePage({ onAddIssue }) {
           Submit
         </button>
       </form>
+      {donemsg ? `${donemsg}` : ""}
     </section>
   );
 }
 
-function IssueListPage({ issues }) {
-  return (
-    <section className="bg-[#0E0C15] text-white px-6 pt-2 pb-10 flex flex-col items-center gap-8 border-t border-violet-900">
-      <h2 className="text-2xl font-bold mt-10">🗂️ Issue List</h2>
-      <div className="flex overflow-x-auto space-x-6 w-full max-w-7xl pb-4">
-        {issues.map((issue, index) => (
-          <IssueCard key={index} {...issue} />
-        ))}
-      </div>
-    </section>
-  );
-}
+// function IssueListPage({ issues }) {   waste
+//   return (
+//     <section className="bg-[#0E0C15] text-white px-6 pt-2 pb-10 flex flex-col items-center gap-8 border-t border-violet-900">
+//       <h2 className="text-2xl font-bold mt-10">🗂️ Issue List</h2>
+//       <div className="flex overflow-x-auto space-x-6 w-full max-w-7xl pb-4">
+//         {issues.map((issue, index) => (
+//           <IssueCard key={index} {...issue} />
+//         ))}
+//       </div>
+//     </section>
+//   );
+// }
 
 function App() {
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  console.log(state);
+  useEffect(() => {
+    async function verify() {
+      let data = await axios.post(
+        "http://localhost:3000/app/v1/users/authorization",
+        {},
+        {
+          headers: {
+            authorization: `bearer ${state}`,
+          },
+        }
+      );
+      if (data.data.status == false) {
+        navigate("/login");
+      }
+    }
+    verify();
+  });
   const [issues, setIssues] = useState([]);
 
   const handleAddIssue = (newIssue) => {
@@ -253,10 +324,9 @@ function App() {
   return (
     <div>
       <ReportIssuePage onAddIssue={handleAddIssue} />
-      <IssueListPage issues={issues} />
+      {/* <IssueListPage issues={issues} /> */}
     </div>
   );
 }
 
 export default App;
-

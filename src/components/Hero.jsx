@@ -1,7 +1,7 @@
-import { curve,background} from "../assets";
+import { curve, background } from "../assets";
 import gcimg2 from "../assets/hero/gcimg2.jpg";
 import blackscreen from "../assets/hero/blackscreen.jpg";
-import glassygreen from "../assets/hero/glassygreen.jpg"
+import glassygreen from "../assets/hero/glassygreen.jpg";
 import Button from "./Button";
 import Section from "./Section";
 import { BackgroundCircles, BottomLine, Gradient } from "./design/Hero";
@@ -11,10 +11,14 @@ import { useRef } from "react";
 import Generating from "./Generating";
 import Notification from "./Notification";
 import CompanyLogos from "./CompanyLogos";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const { state } = useLocation();
+  console.log(state);
   const parallaxRef = useRef(null);
-
+  const navigate = useNavigate();
   return (
     <Section
       className="pt-[12rem] -mt-[5.25rem]"
@@ -26,9 +30,9 @@ const Hero = () => {
       <div className="container relative" ref={parallaxRef}>
         <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[3.875rem] md:mb-20 lg:mb-[6.25rem]">
           <h1 className="h1 mb-6">
-          Empowering Change in your {` `}
+            Empowering Change in your {` `}
             <span className="inline-block relative">
-            Neighbourhood!{" "}
+              Neighbourhood!{" "}
               <img
                 src={curve}
                 className="absolute top-full left-0 w-full xl:-mt-2"
@@ -39,10 +43,17 @@ const Hero = () => {
             </span>
           </h1>
           <p className="body-1 font-bold max-w-3xl mx-auto mb-6 text-n-1 lg:mb-8">
-          "Report cracks, track repairs, and pave the way for smoother streets with GullyConnect!"
-          
+            "Report cracks, track repairs, and pave the way for smoother streets
+            with GullyConnect!"
           </p>
-          <Button href="/issues" white>
+          <Button
+            onClick={() => {
+              navigate("/issues", {
+                state: state,
+              });
+            }}
+            white
+          >
             Get started
           </Button>
         </div>

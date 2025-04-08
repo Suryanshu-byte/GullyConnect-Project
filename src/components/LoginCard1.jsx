@@ -282,7 +282,7 @@ const LoginCard = () => {
               <a href="#">Login </a>
             </button>
 
-            {msg ? `${msg}` : ""}
+            {msg ? `${msg}` : ``}
           </div>
         </div>
       </div>
