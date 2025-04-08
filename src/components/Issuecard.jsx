@@ -1,18 +1,26 @@
 import React, { useState } from "react";
 
 function IssueCard({ priority, category, title, description, location, status, image }) {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showSupportInfo, setShowSupportInfo] = useState(false);
+
   const priorityColors = {
     High: "bg-red-100 text-red-600",
     Medium: "bg-yellow-100 text-yellow-700",
     Low: "bg-blue-100 text-blue-700",
   };
 
+  const getShortDescription = (text) => {
+    const words = text.split(" ");
+    return words.length > 20 ? words.slice(0, 20).join(" ") + "..." : text;
+  };
+
   return (
-    <div className="bg-[#0E0C15] text-white p-4 rounded-xl shadow-[0_0_15px_4px_rgba(139,92,246,0.5)] w-full max-w-md flex flex-col gap-3">
+    <div className="bg-[#0E0C15] text-white p-4 rounded-xl shadow-[16px_0_40px_12px_rgba(139,92,246,0.6)] w-80 flex-shrink-0 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${priorityColors[priority]}`}>{priority} Priority</span>
-          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">{category}</span>
+          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">{category}</span>
         </div>
         {status && (
           <span className="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">
@@ -21,18 +29,47 @@ function IssueCard({ priority, category, title, description, location, status, i
         )}
       </div>
       <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="text-sm text-gray-300">{description}</p>
-      {image && <img src={image} alt="Issue" className="rounded-lg w-full h-48 object-cover" />}
+      <p className="text-sm text-gray-300">
+        {showFullDescription ? description : getShortDescription(description)}
+      </p>
+      {image && <img src={image} alt="Issue" className="rounded-lg w-full h-48 object-cover" />} 
       <div className="flex items-center text-sm text-gray-400 gap-1">
         📍 {location}
       </div>
+      {showSupportInfo && (
+        <div className="text-sm text-gray-300 mt-2">
+          <p>📞 Contact: 123-456-7890</p>
+          <p>✉️ Email: support@example.com</p>
+        </div>
+      )}
       <div className="flex justify-between mt-3">
-        <button className="border border-gray-500 px-3 py-1 rounded-md text-sm hover:bg-gray-800">Support</button>
-        <button className="bg-violet-600 text-white px-3 py-1 rounded-md text-sm hover:bg-violet-700">More Details</button>
+        <button
+          className="border border-gray-500 px-3 py-1 rounded-md text-sm hover:bg-gray-800"
+          onClick={() => setShowSupportInfo(!showSupportInfo)}
+        >
+          Support
+        </button>
+        <button
+          className="bg-violet-600 text-white px-3 py-1 rounded-md text-sm hover:bg-violet-700"
+          onClick={() => setShowFullDescription(!showFullDescription)}
+        >
+          {showFullDescription ? 'Less Details' : 'More Details'}
+        </button>
       </div>
     </div>
   );
 }
+
+const locationData = {
+  "Maharashtra": {
+    "Pune": ["Shivajinagar", "Kothrud", "Baner"],
+    "Mumbai": ["Andheri", "Borivali", "Dadar"]
+  },
+  "Karnataka": {
+    "Bangalore": ["MG Road", "Indiranagar", "Whitefield"],
+    "Mysore": ["VV Mohalla", "Nazarbad", "Kuvempunagar"]
+  },
+};
 
 function ReportIssuePage({ onAddIssue }) {
   const [formData, setFormData] = useState({
@@ -40,7 +77,9 @@ function ReportIssuePage({ onAddIssue }) {
     category: "",
     description: "",
     priority: "Medium",
-    location: "",
+    state: "",
+    district: "",
+    area: "",
     image: "",
   });
 
@@ -56,23 +95,34 @@ function ReportIssuePage({ onAddIssue }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddIssue({ ...formData, status: false });
+    const fullLocation = `${formData.area}, ${formData.district}, ${formData.state}`;
+    onAddIssue({
+      ...formData,
+      location: fullLocation,
+      status: false,
+    });
     setFormData({
       title: "",
       category: "",
       description: "",
       priority: "Medium",
-      location: "",
+      state: "",
+      district: "",
+      area: "",
       image: "",
     });
   };
+
+  const states = Object.keys(locationData);
+  const districts = formData.state ? Object.keys(locationData[formData.state]) : [];
+  const areas = formData.state && formData.district ? locationData[formData.state][formData.district] : [];
 
   return (
     <section className="bg-[#0E0C15] text-white p-6 flex flex-col items-center gap-8">
       <h1 className="text-2xl font-bold">📮 Report an Issue</h1>
       <form
         onSubmit={handleSubmit}
-        className="bg-[#1A1724] p-6 rounded-xl shadow-[0_0_15px_4px_rgba(139,92,246,0.5)] w-full max-w-xl flex flex-col gap-4"
+        className="bg-[#1A1724] p-6 rounded-xl shadow-[16px_0_40px_12px_rgba(139,92,246,0.6)] w-full max-w-xl flex flex-col gap-4"
       >
         <input
           type="text"
@@ -83,15 +133,20 @@ function ReportIssuePage({ onAddIssue }) {
           className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
           required
         />
-        <input
-          type="text"
+        <select
           name="category"
-          placeholder="Type of Problem (e.g., Electricity, Water Logging)"
           value={formData.category}
           onChange={handleChange}
-          className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
+          className="border border-gray-600 bg-transparent text-black p-2 rounded-md font-semibold"
           required
-        />
+        >
+          <option value="">Select Problem Type</option>
+          <option value="Road Condition">Road Condition</option>
+          <option value="Cleanliness">Cleanliness</option>
+          <option value="Water Supply">Water Supply</option>
+          <option value="Electricity">Electricity</option>
+          <option value="Water Logging">Water Logging</option>
+        </select>
         <textarea
           name="description"
           placeholder="Description"
@@ -111,15 +166,52 @@ function ReportIssuePage({ onAddIssue }) {
           <option value="Medium">Medium</option>
           <option value="Low">Low</option>
         </select>
-        <input
-          type="text"
-          name="location"
-          placeholder="Address"
-          value={formData.location}
-          onChange={handleChange}
-          className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
-          required
-        />
+
+        <div className="flex flex-col gap-4">
+          <select
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
+            required
+          >
+            <option value="">Select State</option>
+            {states.map((state) => (
+              <option key={state} value={state}>{state}</option>
+            ))}
+          </select>
+
+          {districts.length > 0 && (
+            <select
+              name="district"
+              value={formData.district}
+              onChange={handleChange}
+              className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
+              required
+            >
+              <option value="">Select District</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>{district}</option>
+              ))}
+            </select>
+          )}
+
+          {areas.length > 0 && (
+            <select
+              name="area"
+              value={formData.area}
+              onChange={handleChange}
+              className="border border-gray-600 bg-transparent text-white p-2 rounded-md"
+              required
+            >
+              <option value="">Select Area</option>
+              {areas.map((area) => (
+                <option key={area} value={area}>{area}</option>
+              ))}
+            </select>
+          )}
+        </div>
+
         <input
           type="file"
           name="image"
@@ -139,19 +231,17 @@ function ReportIssuePage({ onAddIssue }) {
 }
 
 function IssueListPage({ issues }) {
-    return (
-      <section className="bg-[#0E0C15] text-white px-6 pt-2 pb-10 flex flex-col items-start gap-6 border-t border-violet-900">
-        <h2 className="text-2xl font-bold mt-10 ml-2">🗂️ Issue List</h2>
-        <div className="flex overflow-x-auto space-x-6 w-full pb-4 px-2">
-          {issues.map((issue, index) => (
-            <div key={index} className="flex-shrink-0">
-              <IssueCard {...issue} />
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
+  return (
+    <section className="bg-[#0E0C15] text-white px-6 pt-2 pb-10 flex flex-col items-center gap-8 border-t border-violet-900">
+      <h2 className="text-2xl font-bold mt-10">🗂️ Issue List</h2>
+      <div className="flex overflow-x-auto space-x-6 w-full max-w-7xl pb-4">
+        {issues.map((issue, index) => (
+          <IssueCard key={index} {...issue} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function App() {
   const [issues, setIssues] = useState([]);

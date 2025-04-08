@@ -23,7 +23,7 @@ const router = createBrowserRouter([{
   path: '/issues',
   Component: Issuecard,
   // Add your routes here
-}])
+},])
 
 
 

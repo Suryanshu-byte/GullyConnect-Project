@@ -1,6 +1,7 @@
 import { curve,background} from "../assets";
 import gcimg2 from "../assets/hero/gcimg2.jpg";
 import blackscreen from "../assets/hero/blackscreen.jpg";
+import glassygreen from "../assets/hero/glassygreen.jpg"
 import Button from "./Button";
 import Section from "./Section";
 import { BackgroundCircles, BottomLine, Gradient } from "./design/Hero";
@@ -41,7 +42,7 @@ const Hero = () => {
           "Report cracks, track repairs, and pave the way for smoother streets with GullyConnect!"
           
           </p>
-          <Button href="/pricing" white>
+          <Button href="/issues" white>
             Get started
           </Button>
         </div>
