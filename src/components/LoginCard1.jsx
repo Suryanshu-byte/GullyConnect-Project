@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import VanillaTilt from 'vanilla-tilt';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import VanillaTilt from "vanilla-tilt";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const LoginCard = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     VanillaTilt.init(document.querySelectorAll(".card"), {
       max: 15,
@@ -12,6 +14,40 @@ const LoginCard = () => {
       "max-glare": 0.5,
     });
   }, []);
+
+  // states n hooks
+  let [username, setUsername] = useState();
+  let [password, setPassword] = useState();
+  let [msg, setMsg] = useState();
+
+  // functions event
+
+  function user(e) {
+    setUsername(e.target.value);
+  }
+
+  function pass(e) {
+    setPassword(e.target.value);
+  }
+
+  async function login() {
+    try {
+      let user = await axios.post("http://localhost:3000/app/v1/users/login", {
+        username: username,
+        password: password,
+      });
+      console.log(user);
+      if (user.data.status) {
+        navigate("/app", {
+          state: user.data.token,
+        });
+      } else {
+        setMsg("please enter valid email or password");
+      }
+    } catch (e) {
+      setMsg("please enter valid email or password");
+    }
+  }
 
   return (
     <>
@@ -223,17 +259,30 @@ const LoginCard = () => {
         <div className="card">
           <h1 className="login-heading">Login</h1>
           <div className="input-wrapper">
-            <input className="username-input" type="text" placeholder="Username" />
-            <input className="password-input" type="password" placeholder="Password" />
+            <input
+              className="username-input"
+              type="text"
+              placeholder="Username"
+              onChange={user}
+              style={{ backgroundColor: "black" }} /// extra
+            />
+            <input
+              className="password-input"
+              type="password"
+              placeholder="Password"
+              onChange={pass}
+            />
             <div className="extra-links">
               <a href="#">Forgot Password?</a>
-              <a href="#">Create New Account</a>
+              <Link to={"/Newaccount"}>Create New Account</Link>
             </div>
           </div>
           <div className="container-button">
-            <button className="btn">
-              <a href="#">Login</a>
+            <button className="btn" onClick={login}>
+              <a href="#">Login </a>
             </button>
+
+            {msg ? `${msg}` : ""}
           </div>
         </div>
       </div>
